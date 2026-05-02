@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Bộ sưu tập sách - BookHub</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="logo">
+    <strong>📚 Thư viện số</strong>
+  </div>
+
+  <nav class="nav">
+    <a href="home.html">Trang chủ</a>
+    <a href="#">Sách điện tử</a>
+    <a href="dashboard.html">Sách giấy</a>
+    <a href="#">Kho chứng</a>
+    <a href="#">Tin tức</a>
+  </nav>
+
+  <div class="user" id="userSection">
+    <span id="userName">👤 Mạnh</span>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <h1>Chào mừng bạn đến với</h1>
+  <h2>Thư viện trực tuyến của nhóm 11</h2>
+
+  <div class="search-box">
+    <input type="text" placeholder="Nhập tên sách..." id="searchInput">
+    <button onclick="window.location.href='dashboard.html'">Tìm kiếm nâng cao</button>
+  </div>
+</section>
+
+<!-- Filter Section -->
+<div class="filter-section">
+  <div class="filter-container">
+    <button class="filter-btn active" onclick="filterBooks('all')">Tất cả sách</button>
+    <button class="filter-btn" onclick="filterBooks('fiction')">Tiểu thuyết</button>
+    <button class="filter-btn" onclick="filterBooks('knowledge')">Kiến thức</button>
+    <button class="filter-btn" onclick="filterBooks('psychology')">Tâm lý</button>
+  </div>
+  <div class="sort-controls">
+    <select class="sort-select" onchange="sortBooks(this.value)">
+      <option value="popular">Phổ biến nhất</option>
+      <option value="rating">Đánh giá cao</option>
+      <option value="newest">Mới nhất</option>
+    </select>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-container">
+  <div class="content-wrapper">
+    <!-- Books Section -->
+    <div class="books-section">
+      <h2 class="section-title">Ấn Phẩm Nổi Bật</h2>
+      <div class="book-grid" id="bookGrid"></div>
+    </div>
+
+    <!-- Recently Viewed Section -->
+    <div class="books-section">
+      <h2 class="section-title">Ấn Phẩm Vừa Xem</h2>
+      <div class="book-grid" id="recentGrid"></div>
+    </div>
+  </div>
+</div>
+
+<script src="login.js"></script>
+<script src="app.js"></script>
+<script>
+  // Load books when page loads
+  window.addEventListener('load', function() {
+    updateUserUI();
+    loadBooks();
+  });
+  
+  // Search function
+  function searchBooks() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const grid = document.getElementById("bookGrid");
+    grid.innerHTML = "";
+    
+    if (searchTerm === "") {
+      loadBooks();
+      return;
+    }
+    
+    books.filter(book => 
+      book.title.toLowerCase().includes(searchTerm) || 
+      book.author.toLowerCase().includes(searchTerm)
+    ).forEach(book => {
+      createBookCard(book, grid);
+    });
+  }
+  
+  // Filter function
+  function filterBooks(category) {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    const grid = document.getElementById("bookGrid");
+    grid.innerHTML = "";
+    
+    const filteredBooks = category === 'all' ? books : books.filter(b => b.category === category);
+    filteredBooks.forEach(book => {
+      createBookCard(book, grid);
+    });
+  }
+  
+  // Sort function
+  function sortBooks(sortType) {
+    const sorted = [...books];
+    
+    if (sortType === 'rating') {
+      sorted.sort((a, b) => b.rating - a.rating);
+    } else if (sortType === 'newest') {
+      sorted.sort((a, b) => b.id - a.id);
+    }
+    
+    const grid = document.getElementById("bookGrid");
+    grid.innerHTML = "";
+    sorted.forEach(book => {
+      createBookCard(book, grid);
+    });
+  }
+  
+  // ===== USER UI FUNCTION =====
+  function updateUserUI() {
+    const userSection = document.getElementById('userSection');
+    const currentUser = localStorage.getItem('currentUser');
+    
+    if (currentUser) {
+      // User is logged in
+      userSection.innerHTML = `
+        <div class="user-menu">
+          <span id="userDisplay">👤 ${currentUser}</span>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="#" onclick="logout(event)">Đăng xuất</a>
+          </div>
+        </div>
+      `;
+      
+      // Add click event to toggle dropdown
+      document.getElementById('userDisplay').addEventListener('click', function(e) {
+        e.stopPropagation();
+        const menu = document.getElementById('dropdownMenu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      });
+    } else {
+      // User is not logged in
+      userSection.innerHTML = `
+        <div class="auth-buttons">
+          <button class="btn-signup" onclick="window.location.href='login.html'">Đăng ký</button>
+          <button class="btn-login" onclick="window.location.href='login.html'">Đăng nhập</button>
+        </div>
+      `;
+    }
+    
+    loadBooks();
+  }
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function() {
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    if (dropdownMenu) {
+      dropdownMenu.style.display = 'none';
+    }
+  });
+  
+  function logout(event) {
+    event.preventDefault();
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userRole');
+    window.location.href = 'home.html';
+  }
+</script>
+</body>
+</html>
