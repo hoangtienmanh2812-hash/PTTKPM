@@ -1,0 +1,195 @@
+/* ===== REGISTER PAGE ===== */
+.register-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background: white;
+}
+
+.register-left {
+  flex: 1;
+  background-image: url(../img/Thu-vien-so-1080x1080.jpeg);
+  background-size: cover;
+  background-position: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+}
+
+.register-left::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+.register-left h1 {
+  font-size: 42px;
+  text-align: center;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 2;
+}
+
+.register-left p {
+  font-size: 18px;
+  text-align: center;
+  margin: 0;
+  opacity: 0.95;
+  line-height: 1.6;
+  position: relative;
+  z-index: 2;
+}
+
+.register-right {
+  flex: 1;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.register-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+.register-box h2 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.register-box p {
+  margin: 0 0 25px 0;
+  color: #999;
+  font-size: 14px;
+}
+
+.register-box input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.register-box input:focus {
+  outline: none;
+  border-color: #00bcd4;
+  box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+}
+
+.terms-checkbox {
+  margin-bottom: 20px;
+}
+
+.terms-checkbox label {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #666;
+  cursor: pointer;
+}
+
+.terms-checkbox input[type="checkbox"] {
+  width: auto;
+  margin: 0 8px 0 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.terms-checkbox a {
+  color: #00bcd4;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.terms-checkbox a:hover {
+  text-decoration: underline;
+}
+
+.register-box button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.register-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 188, 212, 0.3);
+}
+
+.register-box button:active {
+  transform: translateY(0);
+}
+
+.login-link {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.login-link a {
+  color: #00bcd4;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .register-wrapper {
+    flex-direction: column;
+  }
+
+  .register-left {
+    min-height: 200px;
+  }
+
+  .register-left h1 {
+    font-size: 28px;
+  }
+
+  .register-left p {
+    font-size: 16px;
+  }
+
+  .register-right {
+    padding: 30px 20px;
+  }
+
+  .register-box {
+    max-width: 100%;
+  }
+
+  .register-box h2 {
+    font-size: 22px;
+  }
+}

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chi tiết sách - BookHub</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="book-detail.css">
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="logo">
+    <strong>📚 Thư viện số</strong>
+  </div>
+
+  <nav class="nav">
+    <a href="home.html">Trang chủ</a>
+    <a href="#">Sách điện tử</a>
+    <a href="dashboard.html">Sách giấy</a>
+    <a href="#">Kho chứng</a>
+    <a href="#">Tin tức</a>
+  </nav>
+
+  <div class="user" id="userSection">
+    <span id="userName">👤 Mạnh</span>
+  </div>
+  
+  <div class="cart-section">
+    <button class="cart-btn" onclick="toggleCartDropdown()">
+      🛒 <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <div class="cart-dropdown" id="cartDropdown">
+      <div class="cart-header">
+        <h3>Giỏ hàng</h3>
+        <button class="close-btn" onclick="toggleCartDropdown()">✕</button>
+      </div>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-footer">
+        <button class="btn-checkout" onclick="checkout()">Thanh toán</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+  <a href="home.html">Trang chủ</a> > 
+  <a href="dashboard.html">Ấn phẩm</a> > 
+  <span id="bookTitle">Chi tiết sách</span>
+</div>
+
+<!-- Book Detail Container -->
+<div class="book-detail-container">
+  
+  <!-- Left Column: Book Cover & Info -->
+  <div class="detail-left">
+    <div class="book-cover">
+      <img id="bookImage" src="" alt="Book Cover">
+    </div>
+    
+    <div class="book-stats">
+      <div class="stat">
+        <div class="stat-number" id="bookReviews">0</div>
+        <div class="stat-label">Lượt xem</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" id="bookRating">0</div>
+        <div class="stat-label">Đánh giá</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" id="bookPages">0</div>
+        <div class="stat-label">Trang</div>
+      </div>
+    </div>
+
+    <div class="qr-code">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=BookHub" alt="QR Code">
+    </div>
+  </div>
+
+  <!-- Right Column: Book Details -->
+  <div class="detail-right">
+    
+    <h1 id="detailTitle">Tiêu đề sách</h1>
+    <p class="detail-subtitle" id="detailAuthor">Tác giả: </p>
+
+    <div class="detail-rating">
+      <span class="stars">⭐⭐⭐⭐⭐</span>
+      <span class="rating-number" id="detailRatingNum">5.0</span>
+      <span class="rating-count" id="detailRatingCount">(1000 đánh giá)</span>
+    </div>
+
+    <!-- Book Information -->
+    <div class="detail-info">
+      <div class="info-row">
+        <span class="info-label">Tác giả:</span>
+        <span class="info-value" id="infoAuthor">N/A</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Nhà xuất bản:</span>
+        <span class="info-value" id="infoPublisher">N/A</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Thể loại:</span>
+        <span class="info-value" id="infoGenre">N/A</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Số trang:</span>
+        <span class="info-value" id="infoPages">N/A</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Năm xuất bản:</span>
+        <span class="info-value" id="infoYear">N/A</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">ISBN:</span>
+        <span class="info-value" id="infoISBN">N/A</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Giá:</span>
+        <span class="info-value price" id="infoPrice">0₫</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Trạng thái:</span>
+        <span class="info-value" id="infoStatus">Còn sách</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="detail-actions">
+      <button class="btn btn-primary" onclick="readOnline()">📖 ĐỌC ONLINE</button>
+      <button class="btn btn-secondary" onclick="downloadBook()">⬇️ TẢI VỀ</button>
+      <button class="btn btn-secondary" onclick="addFavorite()">❤️ THÊM YÊU THÍCH</button>
+      <button class="btn btn-secondary" onclick="borrowBook()">🔖 MƯỢN SÁCH</button>
+      <button class="btn btn-primary btn-full" onclick="addToCart()">🛒 THÊM VÀO GIỎ</button>
+    </div>
+
+    <!-- Description -->
+    <div class="detail-description">
+      <h3>Mô tả sách</h3>
+      <p id="detailDescription">Mô tả sách sẽ được hiển thị ở đây.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="detail-tabs">
+      <button class="tab-btn active" onclick="switchTab('details')">CHI TIẾT</button>
+      <button class="tab-btn" onclick="switchTab('review')">TRÍCH ĐOẠN</button>
+      <button class="tab-btn" onclick="switchTab('comment')">NHẬN XÉT</button>
+    </div>
+
+    <div class="tab-content">
+      <div id="details-content" class="tab-pane active">
+        <p id="detailContent">Nội dung chi tiết sách sẽ được hiển thị ở đây.</p>
+      </div>
+      <div id="review-content" class="tab-pane">
+        <p>Trích đoạn từ sách sẽ được hiển thị ở đây.</p>
+      </div>
+      <div id="comment-content" class="tab-pane">
+        <p>Nhận xét từ độc giả sẽ được hiển thị ở đây.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Related Books -->
+  <div class="related-books">
+    <h3>Ấn phẩm liên quan</h3>
+    <div class="related-grid" id="relatedGrid"></div>
+  </div>
+
+</div>
+
+<script src="login.js"></script>
+<script src="app.js"></script>
+<script>
+  let currentBook = null;
+
+  window.addEventListener('load', function() {
+    updateUserUI();
+    
+    const bookId = new URLSearchParams(window.location.search).get('id');
+    if (bookId) {
+      addToRecentlyViewed(parseInt(bookId));
+      loadBookDetail(bookId);
+      loadRelatedBooks(bookId);
+    }
+  });
+
+  function loadBookDetail(bookId) {
+    const book = books.find(b => b.id == bookId);
+    if (!book) {
+      document.body.innerHTML = '<h2 style="text-align:center; padding:40px;">Sách không tìm thấy</h2>';
+      return;
+    }
+
+    currentBook = book;
+
+    // Update header and breadcrumb
+    document.title = book.title + ' - BookHub';
+    document.getElementById('bookTitle').textContent = book.title;
+
+    // Update book image and cover
+    document.getElementById('bookImage').src = book.image;
+    
+    // Update book details
+    document.getElementById('detailTitle').textContent = book.title;
+    document.getElementById('detailAuthor').textContent = 'Tác giả: ' + book.author;
+    document.getElementById('detailRatingNum').textContent = book.rating.toFixed(1);
+    document.getElementById('detailRatingCount').textContent = '(' + book.reviews + ' đánh giá)';
+    document.getElementById('detailDescription').textContent = book.description;
+
+    // Update info rows
+    document.getElementById('infoAuthor').textContent = book.author;
+    document.getElementById('infoPublisher').textContent = 'NXB Giáo Dục';
+    document.getElementById('infoGenre').textContent = book.genre;
+    document.getElementById('infoPages').textContent = book.pages;
+    document.getElementById('infoYear').textContent = book.year;
+    document.getElementById('infoISBN').textContent = book.isbn;
+    document.getElementById('infoPrice').textContent = book.price.toLocaleString() + '₫';
+    document.getElementById('infoStatus').textContent = book.available ? 'Còn sách' : 'Hết sách';
+
+    // Update stats
+    document.getElementById('bookReviews').textContent = book.reviews;
+    document.getElementById('bookRating').textContent = Math.round(book.rating * 10) / 10;
+    document.getElementById('bookPages').textContent = book.pages;
+  }
+
+  function loadRelatedBooks(bookId) {
+    const grid = document.getElementById('relatedGrid');
+    grid.innerHTML = '';
+    
+    const related = books.filter(b => b.id != bookId).slice(0, 4);
+    related.forEach(book => {
+      const div = document.createElement('div');
+      div.className = 'related-book-card';
+      div.innerHTML = `
+        <img src="${book.image}">
+        <h4>${book.title}</h4>
+        <p>${book.author}</p>
+        <div class="rating">⭐ ${book.rating}</div>
+      `;
+      div.onclick = () => window.location.href = 'book-detail.html?id=' + book.id;
+      grid.appendChild(div);
+    });
+  }
+
+  function switchTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      pane.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+
+    // Show selected tab
+    document.getElementById(tabName + '-content').classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  function readOnline() {
+    if (currentBook && currentBook.available) {
+      alert('Đang mở sách: ' + currentBook.title);
+    } else {
+      alert('Sách này không có sẵn để đọc online');
+    }
+  }
+
+  function downloadBook() {
+    if (currentBook) {
+      alert('Đang tải: ' + currentBook.title);
+    }
+  }
+
+  function addFavorite() {
+    if (currentBook) {
+      alert('Đã thêm vào yêu thích: ' + currentBook.title);
+    }
+  }
+
+  function borrowBook() {
+    if (currentBook && currentBook.available) {
+      alert('Đã yêu cầu mượn: ' + currentBook.title);
+    } else {
+      alert('Sách này không có sẵn để mượn');
+    }
+  }
+
+  function addToCart() {
+    if (currentBook) {
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+      if (!cart.includes(currentBook.id)) {
+        cart.push(currentBook.id);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        alert("Đã thêm vào giỏ hàng!");
+      } else {
+        alert("Sách đã có trong giỏ!");
+      }
+    }
+  }
+
+  // ===== USER UI FUNCTION =====
+  function updateUserUI() {
+    const userSection = document.getElementById('userSection');
+    const currentUser = localStorage.getItem('currentUser');
+    
+    if (currentUser) {
+      // User is logged in
+      userSection.innerHTML = `
+        <div class="user-menu">
+          <span id="userDisplay">👤 ${currentUser}</span>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="#" onclick="logout(event)">Đăng xuất</a>
+          </div>
+        </div>
+      `;
+      
+      // Add click event to toggle dropdown
+      document.getElementById('userDisplay').addEventListener('click', function(e) {
+        e.stopPropagation();
+        const menu = document.getElementById('dropdownMenu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      });
+    } else {
+      // User is not logged in
+      userSection.innerHTML = `
+        <div class="auth-buttons">
+          <button class="btn-signup" onclick="window.location.href='login.html'">Đăng ký</button>
+          <button class="btn-login" onclick="window.location.href='login.html'">Đăng nhập</button>
+        </div>
+      `;
+    }
+  }
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function() {
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    if (dropdownMenu) {
+      dropdownMenu.style.display = 'none';
+    }
+  });
+  
+  function logout(event) {
+    event.preventDefault();
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userRole');
+    window.location.href = 'home.html';
+  }
+</script>
+
+</body>
+</html>

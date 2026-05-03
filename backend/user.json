@@ -1,0 +1,9 @@
+[
+  {
+    "id": 1,
+    "name": "Admin",
+    "email": "admin@librai.com",
+    "password": "$2a$08$3SxQyJZkYzHkq0R4hPqKQOeE1Ht4e6I8cFZ7oXEUbL3Vcm5Gd2eU6",
+    "role": "admin"
+  }
+]

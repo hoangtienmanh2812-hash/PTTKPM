@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng ký - Thư viện sách</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="register.css">
+</head>
+<body>
+
+<div class="register-wrapper">
+
+  <div class="register-left">
+    <h1>Tham gia Thư viện sách</h1>
+    <p>Truy cập không giới hạn vào hàng ngàn cuốn sách và tài liệu học tập</p>
+  </div>
+
+  <div class="register-right">
+    <div class="register-box">
+      <div style="text-align: center; margin-bottom: 25px;">
+        <div style="font-size: 48px; margin-bottom: 10px;">📝</div>
+        <h2>Tạo tài khoản</h2>
+      </div>
+      <p>Điền thông tin của bạn để đăng ký</p>
+
+      <div id="error" style="color: #d32f2f; font-size: 14px; margin-bottom: 15px; text-align: center; min-height: 20px;"></div>
+      <div id="success" style="color: #4caf50; font-size: 14px; margin-bottom: 15px; text-align: center; min-height: 20px;"></div>
+
+      <input id="fullname" type="text" placeholder="Họ và tên">
+      <input id="email" type="email" placeholder="Địa chỉ email">
+      <input id="password" type="password" placeholder="Mật khẩu (ít nhất 6 ký tự)">
+      <input id="confirmPassword" type="password" placeholder="Xác nhận mật khẩu">
+      <input id="phone" type="tel" placeholder="Số điện thoại (tuỳ chọn)">
+
+      <div class="terms-checkbox">
+        <label>
+          <input type="checkbox" id="agreeTerms">
+          Tôi đồng ý với <a href="#">Điều khoản sử dụng</a>
+        </label>
+      </div>
+
+      <button onclick="register()">ĐĂNG KÝ</button>
+
+      <div class="login-link">
+        Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="register.js"></script>
+</body>
+</html>

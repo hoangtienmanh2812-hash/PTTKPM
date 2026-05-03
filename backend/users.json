@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Admin",
+    "email": "admin@librai.com",
+    "password": "$2a$08$V3dMM0fC4/T1HI9WgU.nfOVKXhqPBLOvBKKo15iJhZQGV3GGgwVvC",
+    "role": "admin"
+  },
+  {
+    "id": 2,
+    "name": "Mạnh",
+    "email": "user@gmail.com",
+    "password": "$2a$08$V3dMM0fC4/T1HI9WgU.nfOVKXhqPBLOvBKKo15iJhZQGV3GGgwVvC",
+    "role": "user"
+  },
+  {
+    "id": 3,
+    "name": "test",
+    "email": "test6@gmail.com",
+    "password": "$2b$08$jU8XAdfnWLfLnsJEmZhiH.JoLLvbihM9y3ohY7o27AF2HK9.gNRam",
+    "role": "user"
+  }
+]
