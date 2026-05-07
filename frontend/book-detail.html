@@ -288,15 +288,26 @@
 
   function addToCart() {
     if (currentBook) {
-      let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-      if (!cart.includes(currentBook.id)) {
-        cart.push(currentBook.id);
-        localStorage.setItem("cart", JSON.stringify(cart));
-        alert("Đã thêm vào giỏ hàng!");
-      } else {
-        alert("Sách đã có trong giỏ!");
+      let cart = JSON.parse(localStorage.getItem("cart")) || {};
+      
+      // Chuyển đổi nếu là mảng cũ (backward compatibility)
+      if (Array.isArray(cart)) {
+        const newCart = {};
+        cart.forEach(id => {
+          newCart[id] = 1;
+        });
+        cart = newCart;
       }
+      
+      if (cart[currentBook.id]) {
+        cart[currentBook.id] += 1;
+      } else {
+        cart[currentBook.id] = 1;
+      }
+      
+      localStorage.setItem("cart", JSON.stringify(cart));
+      showNotification(`Đã thêm "${currentBook.title}" vào giỏ hàng!`);
+      updateCartDisplay();
     }
   }
 

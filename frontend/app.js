@@ -237,16 +237,31 @@ function createBookCard(book, grid) {
   grid.appendChild(div);
 }
 
-function addToCart(bookId) {
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+function addToCart(bookId, quantity = 1) {
+  let cart = JSON.parse(localStorage.getItem("cart")) || {};
+  
+  // Chuyển từ mảng cũ sang object nếu cần
+  if (Array.isArray(cart)) {
+    const oldCart = cart;
+    cart = {};
+    oldCart.forEach(id => {
+      cart[id] = 1;
+    });
+  }
 
-  if (!cart.includes(bookId)) {
-    cart.push(bookId);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    updateCartDisplay();
-    alert("Đã thêm vào giỏ hàng!");
+  if (cart[bookId]) {
+    cart[bookId] += quantity;
   } else {
-    alert("Sách đã có trong giỏ!");
+    cart[bookId] = quantity;
+  }
+  
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCartDisplay();
+  
+  // Thông báo thành công
+  const book = books.find(b => b.id === bookId);
+  if (book) {
+    showNotification(`Đã thêm "${book.title}" vào giỏ hàng!`);
   }
 }
 
@@ -258,76 +273,228 @@ function toggleCartDropdown() {
 }
 
 function updateCartDisplay() {
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const cartCount = document.getElementById('cartCount');
-  const cartItems = document.getElementById('cartItems');
+  const cart = JSON.parse(localStorage.getItem("cart")) || {};
   
-  if (cartCount) {
-    cartCount.textContent = cart.length;
+  // Chuyển đổi nếu là mảng cũ
+  if (Array.isArray(cart)) {
+    const newCart = {};
+    cart.forEach(id => {
+      newCart[id] = 1;
+    });
+    localStorage.setItem("cart", JSON.stringify(newCart));
   }
   
+  const cartCount = document.getElementById('cartCount');
+  const cartItems = document.getElementById('cartItems');
+  const cartFooter = document.querySelector('.cart-footer');
+  
+  let totalItems = 0;
+  let totalPrice = 0;
+  
+  // Tính tổng số lượng và giá
+  Object.keys(cart).forEach(bookId => {
+    const quantity = cart[bookId] || 1;
+    totalItems += quantity;
+    const book = books.find(b => b.id == bookId);
+    if (book) {
+      totalPrice += book.price * quantity;
+    }
+  });
+  
+  // Cập nhật số lượng giỏ hàng
+  if (cartCount) {
+    cartCount.textContent = totalItems;
+  }
+  
+  // Render các item trong giỏ
   if (cartItems) {
     cartItems.innerHTML = '';
     
-    if (cart.length === 0) {
+    if (Object.keys(cart).length === 0) {
       cartItems.innerHTML = '<div class="cart-empty">Giỏ hàng trống</div>';
+      if (cartFooter) {
+        cartFooter.innerHTML = `
+          <div style="text-align: center; width: 100%; color: #999;">
+            <p style="margin: 0;">Hãy thêm sách vào giỏ hàng</p>
+          </div>
+        `;
+      }
       return;
     }
     
-    cart.forEach(bookId => {
-      const book = books.find(b => b.id === bookId);
+    Object.keys(cart).forEach(bookId => {
+      const book = books.find(b => b.id == bookId);
       if (book) {
+        const quantity = cart[bookId] || 1;
+        const subtotal = book.price * quantity;
+        
         const itemDiv = document.createElement('div');
         itemDiv.className = 'cart-item';
         itemDiv.innerHTML = `
-          <div class="cart-item-info">
-            <div class="cart-item-title">${book.title}</div>
-            <div class="cart-item-price">${book.price.toLocaleString()}₫</div>
+          <div class="cart-item-content">
+            <div class="cart-item-header">
+              <div class="cart-item-title">${book.title}</div>
+              <button class="cart-item-remove" onclick="removeFromCart(${bookId})" title="Xóa">✕</button>
+            </div>
+            <div class="cart-item-details">
+              <div class="cart-item-price">${book.price.toLocaleString()}₫</div>
+              <div class="cart-item-quantity">
+                <button onclick="decreaseQuantity(${bookId})" class="qty-btn qty-minus">−</button>
+                <span class="qty-value">${quantity}</span>
+                <button onclick="increaseQuantity(${bookId})" class="qty-btn qty-plus">+</button>
+              </div>
+              <div class="cart-item-subtotal">${subtotal.toLocaleString()}₫</div>
+            </div>
           </div>
-          <button class="cart-item-remove" onclick="removeFromCart(${bookId})">Xóa</button>
         `;
         cartItems.appendChild(itemDiv);
       }
     });
+    
+    // Update cart footer with total
+    if (cartFooter) {
+      cartFooter.innerHTML = `
+        <div class="cart-summary">
+          <div class="summary-line">
+            <span>Số lượng:</span>
+            <span class="summary-value">${totalItems} sách</span>
+          </div>
+          <div class="summary-line total">
+            <span>Tổng cộng:</span>
+            <span class="summary-value">${totalPrice.toLocaleString()}₫</span>
+          </div>
+        </div>
+        <button class="btn-checkout" onclick="checkout()">Thanh toán</button>
+      `;
+    }
   }
 }
 
-function removeFromCart(bookId) {
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  cart = cart.filter(id => id !== bookId);
+function increaseQuantity(bookId) {
+  let cart = JSON.parse(localStorage.getItem("cart")) || {};
+  if (cart[bookId]) {
+    cart[bookId] += 1;
+  } else {
+    cart[bookId] = 1;
+  }
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCartDisplay();
 }
 
+function decreaseQuantity(bookId) {
+  let cart = JSON.parse(localStorage.getItem("cart")) || {};
+  if (cart[bookId] && cart[bookId] > 1) {
+    cart[bookId] -= 1;
+  } else {
+    delete cart[bookId];
+  }
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCartDisplay();
+}
+
+function removeFromCart(bookId) {
+  let cart = JSON.parse(localStorage.getItem("cart")) || {};
+  delete cart[bookId];
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCartDisplay();
+  showNotification("Đã xóa khỏi giỏ hàng");
+}
+
 function checkout() {
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  if (cart.length === 0) {
-    alert("Giỏ hàng trống!");
+  const cart = JSON.parse(localStorage.getItem("cart")) || {};
+  if (Object.keys(cart).length === 0) {
+    showNotification("Giỏ hàng trống!");
     return;
   }
-  
+
+  const cartList = [];
   let total = 0;
-  let cartInfo = "Các sách trong giỏ:\n";
-  
-  cart.forEach(bookId => {
-    const book = books.find(b => b.id === bookId);
+
+  Object.keys(cart).forEach((bookId, index) => {
+    const book = books.find(b => b.id == bookId);
     if (book) {
-      cartInfo += `- ${book.title}: ${book.price.toLocaleString()}₫\n`;
-      total += book.price;
+      const quantity = cart[bookId] || 1;
+      const subtotal = book.price * quantity;
+      cartList.push({
+        index: index + 1,
+        title: book.title,
+        quantity,
+        price: book.price,
+        subtotal,
+      });
+      total += subtotal;
     }
   });
-  
-  cartInfo += `\nTổng cộng: ${total.toLocaleString()}₫`;
-  
-  if (confirm(cartInfo + "\n\nXác nhận thanh toán?")) {
-    alert("Thanh toán thành công! Cảm ơn bạn đã mua sắm.");
-    localStorage.removeItem("cart");
-    updateCartDisplay();
-    const cartDropdown = document.getElementById('cartDropdown');
-    if (cartDropdown) {
-      cartDropdown.classList.remove('active');
-    }
+
+  openCheckoutModal(cartList, total);
+}
+
+function openCheckoutModal(items, total) {
+  createCheckoutModal();
+  const modal = document.getElementById('checkoutModal');
+  const cartPanel = document.getElementById('checkoutCartPanel');
+  const totalValue = document.getElementById('checkoutTotalValue');
+
+  if (!modal || !cartPanel || !totalValue) {
+    return;
   }
+
+  if (items.length === 0) {
+    cartPanel.innerHTML = '<div class="checkout-empty">Giỏ sách đang rỗng</div>';
+  } else {
+    cartPanel.innerHTML = items.map(item => `
+      <div class="checkout-item">
+        <div class="checkout-item-index">${item.index}</div>
+        <div class="checkout-item-info">
+          <div class="checkout-item-title">${item.title}</div>
+          <div class="checkout-item-meta">${item.price.toLocaleString()}₫ × ${item.quantity}</div>
+        </div>
+        <div class="checkout-item-subtotal">${item.subtotal.toLocaleString()}₫</div>
+      </div>
+    `).join('');
+  }
+
+  totalValue.textContent = total.toLocaleString() + '₫';
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function hideCheckoutModal() {
+  const modal = document.getElementById('checkoutModal');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+}
+
+function completeCheckout() {
+  localStorage.removeItem('cart');
+  updateCartDisplay();
+  hideCheckoutModal();
+  const cartDropdown = document.getElementById('cartDropdown');
+  if (cartDropdown) {
+    cartDropdown.classList.remove('active');
+  }
+  showNotification('✅ Thanh toán thành công! Cảm ơn bạn đã mua sắm.');
+}
+
+// Hàm thông báo
+function showNotification(message) {
+  // Tạo phần tử thông báo
+  let notification = document.getElementById('notification');
+  if (!notification) {
+    notification = document.createElement('div');
+    notification.id = 'notification';
+    document.body.appendChild(notification);
+  }
+  
+  notification.textContent = message;
+  notification.style.display = 'block';
+  
+  // Ẩn sau 3 giây
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, 3000);
 }
 
 function logout() {
@@ -337,6 +504,7 @@ function logout() {
 
 // Initialize cart display and close dropdown when clicking outside
 document.addEventListener('DOMContentLoaded', function() {
+  createCheckoutModal();
   updateCartDisplay();
   
   document.addEventListener('click', function(e) {
@@ -350,3 +518,59 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 loadBooks();
+
+function createCheckoutModal() {
+  if (document.getElementById('checkoutModal')) {
+    return;
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'checkoutModal';
+  modal.className = 'modal-overlay';
+  modal.setAttribute('aria-hidden', 'true');
+  modal.innerHTML = `
+    <div class="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkoutModalTitle">
+      <div class="checkout-header">
+        <div>
+          <h2 id="checkoutModalTitle">Phiếu mượn</h2>
+          <p>Kiểm tra giỏ hàng và hoàn tất thanh toán</p>
+        </div>
+        <button class="modal-close" onclick="hideCheckoutModal()" aria-label="Đóng">✕</button>
+      </div>
+      <div class="checkout-tabs">
+        <button class="checkout-tab active" data-tab="cart" onclick="switchCheckoutTab(event)">Giỏ sách</button>
+        <button class="checkout-tab" data-tab="loan" onclick="switchCheckoutTab(event)">Phiếu mượn</button>
+      </div>
+      <div class="checkout-body">
+        <div class="checkout-panel active" id="checkoutCartPanel"></div>
+        <div class="checkout-panel" id="checkoutLoanPanel">
+          <div class="checkout-empty">Chức năng phiếu mượn sẽ sớm có.</div>
+        </div>
+      </div>
+      <div class="checkout-footer">
+        <div class="checkout-summary">
+          <span>Tổng cộng:</span>
+          <strong id="checkoutTotalValue">0₫</strong>
+        </div>
+        <button class="btn-confirm-checkout" onclick="completeCheckout()">Xác nhận thanh toán</button>
+      </div>
+    </div>
+  `;
+
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      hideCheckoutModal();
+    }
+  });
+
+  document.body.appendChild(modal);
+}
+
+function switchCheckoutTab(event) {
+  const selectedTab = event.currentTarget;
+  const tabName = selectedTab.dataset.tab;
+  document.querySelectorAll('.checkout-tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('.checkout-panel').forEach(panel => panel.classList.remove('active'));
+  selectedTab.classList.add('active');
+  document.getElementById(`checkout${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Panel`).classList.add('active');
+}

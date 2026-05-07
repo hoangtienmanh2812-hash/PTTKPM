@@ -19,5 +19,12 @@
     "email": "test6@gmail.com",
     "password": "$2b$08$jU8XAdfnWLfLnsJEmZhiH.JoLLvbihM9y3ohY7o27AF2HK9.gNRam",
     "role": "user"
+  },
+  {
+    "id": 4,
+    "name": "Hoàng Tiến Mạnh",
+    "email": "test7@gmail.com",
+    "password": "$2b$08$OjdwjosT6qIftbV2UCHecOFVvRc999sNtta8dDtCmG8v4h6nWrNiS",
+    "role": "user"
   }
 ]
